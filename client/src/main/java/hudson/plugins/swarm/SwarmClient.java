@@ -320,10 +320,21 @@ public class SwarmClient {
 
 
     public synchronized static HttpClient getGlobalHttpClient() {
-        if(g_client == null)
+        if(g_client == null) {
             g_client = new HttpClient(new MultiThreadedHttpConnectionManager());
-
+            setProxyProperties(g_client);
+        }
         return g_client;
+    }
+
+    private static void setProxyProperties(HttpClient client){
+        final String proxyHost = System.getProperty("http.proxyHost");
+        final String proxyPort = System.getProperty("http.proxyPort");
+
+        if (StringUtils.isNotEmpty(proxyHost) &&  StringUtils.isNotEmpty(proxyPort)) {
+            client.getHostConfiguration().setProxy(proxyHost, Integer.parseInt(proxyPort));
+            logger.info("Using proxy " + proxyHost + ":" + proxyPort);
+        }
     }
 
 
